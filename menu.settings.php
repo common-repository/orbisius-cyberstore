@@ -1,0 +1,418 @@
+<?php
+$settings_key = $orbisius_digishop_obj->get('plugin_settings_key');
+$opts = $orbisius_digishop_obj->get_options();
+
+$plugin_file = dirname(__FILE__) . '/orbisius-cyberstore.php';
+
+?>
+<div class="wrap">
+        <h2>Orbisius CyberStore</h2>
+
+        <div class="updated"><p>
+            <?php if (!empty($_REQUEST['settings-updated'])) : ?>
+               <strong>Settings saved.</strong>
+            <?php else : ?>
+               Orbisius CyberStore plugin allows you to start selling your digital products such as e-books, reports in minutes.
+            <?php endif; ?>
+        </p></div>
+		
+        <div id="poststuff">
+
+            <div id="post-body" class="metabox-holder columns-2">
+                <!--<div class="submit" style="display: inline;border: 1px solid red;">
+                                    <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+                                </div>-->
+                <!-- main content -->
+                <div id="post-body-content">
+
+                    <div class="meta-box-sortables ui-sortable">
+
+                        <div class="postbox">
+                            <div class="inside">
+                                <form method="post" action="options.php">
+									<?php settings_fields($orbisius_digishop_obj->get('plugin_dir_name')); ?>
+									<table class="form-table">										
+										<tr valign="top">
+											<th scope="row">Status</th>
+											<td>
+												<label for="radio1">
+													<input type="radio" id="radio1" name="<?php echo $settings_key; ?>[status]"
+														value="1" <?php echo empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Enabled
+												</label>
+												<br/>
+												<label for="radio2">
+													<input type="radio" name="<?php echo $settings_key; ?>[status]"  id="radio2"
+														value="0" <?php echo!empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Disabled
+												</label>
+											</td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">PayPal Email &amp; Currency</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[business_email]" 
+                                                       placeholder="PayPal Email Address"
+                                                       value="<?php echo $opts['business_email']; ?>" class="input_field" />
+
+                                                | Currency
+                                                <input type="text" name="<?php echo $settings_key; ?>[currency]" 
+                                                       placeholder="Currency e.g. CAD, USD, EUR"
+                                                       value="<?php echo $opts['currency']; ?>" size="4"/> Example: USD, CAD, EUR
+                                                    <a href="https://developer.paypal.com/webapps/developer/docs/classic/api/currency_codes/" target="_blank">See full list</a>
+                                            </td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Order Notification Email</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[notification_email]" 
+                                                       placeholder="Email e.g. order@yoursite.com"
+                                                       value="<?php echo $opts['notification_email']; ?>" class="input_field" />
+												The plugin will send order info to that email (usually same as site admin email)
+											</td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Subject (download email)</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[purchase_subject]" 
+                                                       placeholder="Your download link to a recent order"
+                                                       value="<?php echo $opts['purchase_subject']; ?>" class="input_field widefat"/></td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Content (download email)</th>
+											<td>
+												<?php if (has_action('orb_cyber_store_render_textarea2richtext')) : ?>
+													<?php do_action('orb_cyber_store_render_textarea2richtext', $opts, $settings_key, 'purchase_content'); ?>
+												<?php else : ?>
+                                                    <textarea name="<?php echo $settings_key; ?>[purchase_content]" class="widefat" rows="8"><?php echo $opts['purchase_content']; ?></textarea>
+												<?php endif; ?>
+
+												<p>
+													<div>
+														<strong>Supported Variables <a href="javascript:void(0);" onclick="jQuery('.suppored_vars').toggle('slow');return false;">(show/hide)</a></strong>
+														<ul class="suppored_vars app_hide hide-if-js">
+															<li>%%SITE%%</li>
+															<li>%%FIRST_NAME%% - Payer's first name</li>
+															<li>%%LAST_NAME%% - Payer's last name</li>
+															<li>%%EMAIL%% - Payer's email</li>
+															<li>%%TXN_ID%% - Transaction ID</li>
+															<li>%%INVOICE_ID%% - Invoice ID</li>
+															<li>%%PRODUCT_NAME%% - Product name</li>
+															<li>%%PRODUCT_PRICE%% - Product price</li>
+															<li>%%DOWNLOAD_LINK%% - Download link</li>
+														</ul>
+													</div>
+												</p>
+											</td>
+										</tr>
+
+                                        <tr valign="top">
+											<th scope="row">Subject for failed transaction (download email)</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[failed_purchase_subject]"
+                                                       placeholder="Your download link to a recent order"
+                                                       value="<?php echo $opts['failed_purchase_subject']; ?>" class="input_field widefat"/></td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Content for failed transaction</th>
+											<td>
+												<?php if (has_action('orb_cyber_store_render_textarea2richtext')) : ?>
+													<?php do_action('orb_cyber_store_render_textarea2richtext', $opts, $settings_key, 'failed_purchase_content'); ?>
+												<?php else : ?>
+                                                    <textarea name="<?php echo $settings_key; ?>[failed_purchase_content]" class="widefat" rows="8"><?php echo $opts['failed_purchase_content']; ?></textarea>
+												<?php endif; ?>
+
+                                                <br/>Note: The failed subject and text is sent to sent to the buyers when Paypal reports that the transaction is invalid.
+                                                <br/>That way the buyer will that the admin is looking into it.
+                                                <br/>The admin should check if there is a confirmation email from Paypal and send the download link manually.
+												<p>
+													<div>
+														<strong>Supported Variables <a href="javascript:void(0);" onclick="jQuery('.suppored_vars').toggle('slow');return false;">(show/hide)</a></strong>
+														<ul class="suppored_vars app_hide hide-if-js">
+															<li>%%SITE%%</li>
+															<li>%%FIRST_NAME%% - Payer's first name</li>
+															<li>%%LAST_NAME%% - Payer's last name</li>
+															<li>%%EMAIL%% - Payer's email</li>
+															<li>%%TXN_ID%% - Transaction ID (PayPal)</li>
+															<li>%%PRODUCT_NAME%% - Product name</li>
+															<li>%%PRODUCT_PRICE%% - Product price</li>
+															<li>%%DOWNLOAD_LINK%% - Download link</li>
+														</ul>
+													</div>
+												</p>
+											</td>
+										</tr>
+
+										<tr valign="top">
+											<th scope="row">Thank You message (after a successful payment)</th>
+											<!--<td><textarea name="<?php echo $settings_key; ?>[purchase_thanks]"><?php echo $opts['purchase_thanks']; ?></textarea></td>-->
+											<td><input type="text" name="<?php echo $settings_key; ?>[purchase_thanks]" value="<?php echo $opts['purchase_thanks']; ?>" class="input_field widefat"/></td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Error message (after a failed payment)</th>
+											<!--<td><textarea name="<?php echo $settings_key; ?>[purchase_error]"><?php echo $opts['purchase_error']; ?></textarea></td>-->
+											<td><input type="text" name="<?php echo $settings_key; ?>[purchase_error]" value="<?php echo $opts['purchase_error']; ?>" class="input_field widefat"/></td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Misc</th>
+											<td>
+                                                <label for="digishop_render_title">
+														<input type="checkbox" id="digishop_render_title" name="<?php echo $settings_key; ?>[render_title]" value="1"
+															<?php echo empty($opts['render_title']) ? '' : 'checked="checked"'; ?> /> Show product title (above the Buy Now button)</label>
+
+                                                <br/> <label for="digishop_render_price">
+														<input type="checkbox" id="digishop_render_price" name="<?php echo $settings_key; ?>[render_price]" value="1"
+															<?php echo empty($opts['render_price']) ? '' : 'checked="checked"'; ?> /> Show product price (above the Buy Now button)</label>
+
+                                                <br/><label for="digishop_require_shipping">
+														<input type="checkbox" id="digishop_require_shipping" name="<?php echo $settings_key; ?>[require_shipping]" value="1"
+															<?php echo empty($opts['require_shipping']) ? '' : 'checked="checked"'; ?> /> Require buyer's shipping address (on PayPal's site)</label>
+
+                                                
+                                                <br/><label for="digishop_form_new_window">
+														<input type="checkbox" id="digishop_form_new_window" name="<?php echo $settings_key; ?>[form_new_window]" value="1"
+															<?php echo empty($opts['form_new_window']) ? '' : 'checked="checked"'; ?> /> Enable form submission in a new window</label>
+											</td>
+										</tr>
+										<?php if (0) : /* No need to parse old code because this plugin has to read another db table and match ids. */ ?>
+										<tr valign="top">
+											<th scope="row">Parse the old [digishop] shortcode</th>
+											<td>
+												<label for="digishop_require_parse_old_shortcode">
+														<input type="checkbox" id="digishop_require_parse_old_shortcode"
+															   name="<?php echo $settings_key; ?>[parse_old_shortcode]" value="1"
+															<?php echo empty($opts['parse_old_shortcode']) ? '' : 'checked="checked"'; ?> /> Enable</label>
+												<p>Check the box if you are running OrbisiusCyberstore and the DigiShop</p>
+											</td>
+										</tr>
+										<?php endif; ?>
+
+                                        <tr valign="top">
+                                            <th scope="row" colspan="2"><h2>Extensions
+                                                    |
+                                                <a href="http://orbisius.com/products/wordpress-plugins/orbisius-cyberstore/extensions/?utm_source=<?php
+                                                    echo str_replace('.php', '', basename($plugin_file));?>&utm_medium=plugin-settings&utm_campaign=product"
+                                                    title="If you want a custom web/mobile app/plugin developed contact us. This opens in a new window/tab"
+                                                    class="button" target="_blank">Get Extensions</a>
+                                                </h2>
+                                            </th>
+                                        </tr>
+
+										<?php if (has_action('orb_cyber_store_render_extension_settings')) : ?>
+											<?php do_action('orb_cyber_store_render_extension_settings', $opts, $settings_key); ?>
+										<?php else : ?>
+											<tr valign="top">
+												<td colspan="2">
+													No extensions found.
+												</td>
+											</tr>
+										<?php endif; ?>
+
+										<tr valign="top">
+											<th scope="row" colspan="2">
+												<h2>Advanced
+													(<a href="javascript:void(0);" onclick="jQuery('.digishop_advanced_options').toggle();return false;">show/hide</a>)
+												</h2>
+											</th>
+										</tr>
+										</table>
+										<table class="digishop_advanced_options app_hide hide-if-js">
+										<tr valign="top">
+											<th scope="row">Sandbox (no real transactions)</th>
+											<td>
+												<label for="digishop_sandbox_mode">
+														<input type="checkbox" id="digishop_sandbox_mode" name="<?php echo $settings_key; ?>[test_mode]" value="1"
+															<?php echo empty($opts['test_mode']) ? '' : 'checked="checked"'; ?> /> Enable Sandbox</label>
+
+												<p>If the sandbox mode is enabled please use the test accounts generated from
+														<a href="http://developer.paypal.com" target="_blank">developer.paypal.com</a> otherwise transactions will fail.
+												</p>
+											</td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Sandbox PayPal Email</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[sandbox_business_email]" value="<?php echo $opts['sandbox_business_email']; ?>" class="widefat" /></td>
+										</tr>
+                                        <tr valign="top">
+											<th scope="row">Sandbox IP Address</th>
+											<td>
+												<input type="text" id="sandbox_only_ip" name="<?php echo $settings_key; ?>[sandbox_only_ip]"
+														value="<?php echo $opts['sandbox_only_ip']; ?>" class="input_field" />
+												Your IP: <?php echo $_SERVER['REMOTE_ADDR']; ?> (<a href="javascript:void(0);" onclick="jQuery('#sandbox_only_ip').val('<?php echo $_SERVER['REMOTE_ADDR']; ?>');"
+																										title="This will use your current IP address as sandbox IP address.">Use</a>)
+                                                    <p>If the sandbox is enabled and you have entered IP the sandbox mode will be enabled for that specific IP address <strong>only</strong>. <br/>
+													Is it made for testing live installation of Orbisius CyberStore.
+												</p>
+											</td>
+										</tr>
+                                        <tr valign="top">
+											<th scope="row">Logging (for debugging purposes only!)</th>
+											<td>
+													<label for="digishop_logging">
+														<input type="checkbox" id="digishop_logging" name="<?php echo $settings_key; ?>[logging_enabled]" value="1"
+															<?php echo empty($opts['logging_enabled']) ? '' : 'checked="checked"'; ?> /> Enable Logging</label>
+
+													<br/> Log Directory: <?php echo $orbisius_digishop_obj->get('plugin_data_dir'); ?>
+													<?php echo is_writable($orbisius_digishop_obj->get('plugin_data_dir'))
+																? '<br/>'
+																: $orbisius_digishop_obj->msg('Folder not writable!'); ?>
+													All the transaction info will be recorded including customer info sent from PayPal.
+													We recommend that you connect using FTP client (e.g. FileZilla) and delete the log files.
+													<br/>Note: To see logged transactions enable logging and come back to advanced options.
+													The logs will be listed here.
+
+													<?php
+													// Let's load the log files ONLY when the logging is enabled.
+													if (!empty($opts['logging_enabled'])) {
+														$files = glob($orbisius_digishop_obj->get('plugin_data_dir') . '/log.*');
+
+														if (!empty($files)) {
+                                                            $buff = '';
+															echo "<div><br/>File(s): " . count($files);
+															echo "<ul>";
+
+															foreach ($files as $full_file) {
+																$file = basename($full_file);
+																$size = filesize($full_file);
+																$size_fmt = Orbisius_CyberStoreUtil::format_file_size($size);
+                                                                $dl_log_link = $orbisius_digishop_obj->get('site_url') . '?' . http_build_query(array(
+                                                                    $orbisius_digishop_obj->get('plugin_id_str') . '_cmd' => 'download_log',
+                                                                    $orbisius_digishop_obj->get('plugin_id_str') . '_file' => $file,
+                                                                ));
+
+																if ($size > 100 * 1024) {
+																	$buff = $orbisius_digishop_obj->msg("Only files smaller than 100KB will be visualized. For larger files do use the download link.");
+																} else {
+																	$buff = file_get_contents($full_file);
+																	$buff = "<br/><textarea class='widefat' readonly='readonly' rows='3'>" . $buff . '</textarea>';
+																}
+
+																echo "\t<li>[<a href='$dl_log_link'>Download</a>] $file, $size_fmt $buff</li>\n";
+															}
+
+															echo "</ul>";
+															echo "</div>";
+														}
+													}
+
+													?>
+											</td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Submit Button Image Source
+													<br/>(optional)
+											</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[submit_button_img_src]" value="<?php echo $opts['submit_button_img_src']; ?>" class="widefat" />
+												Example: http://domain.com/image.jpg ,
+												<?php
+												if (!empty($opts['submit_button_img_src'])) {
+													echo <<<EOF
+						<br/> <span style="vertical-align:middle;">Preview: <img src="{$opts['submit_button_img_src']}" alt="" /></span>
+EOF;
+												}
+												?>
+											</td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Secure HOP URL</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[secure_hop_url]" value="<?php echo $opts['secure_hop_url']; ?>" class="widefat" />
+												<br/>Example: https://secure.yoursite.com/proxy.php
+												<br/>
+												The main idea of the Secure HOP URL is to redirect to another URL. It must redirect to an address passed by the "r" parameter.
+												Having this kind of redirect is very useful because when your visitors are about to return to your site PayPal checks and if
+												the returning URL is a non-ssl link then it puts a prompt. <br/>
+												
+												<a href="<?php echo $orbisius_digishop_obj->get('plugin_url');?>/images/example_paypal_non_ssl_site_warning.png" target="_blank"><img
+														style="border:2px dashed red;width: 50%;" src="<?php echo $orbisius_digishop_obj->get('plugin_url');?>/images/example_paypal_non_ssl_site_warning.png" alt="example_paypal_non_ssl_site_warning" /></a>
+
+												<div><strong>Sample redirect script</strong>. Right click and copy it and install it on your secure area.</div>
+												<textarea class="input_field widefat" rows="6" readonly="readonly" onclick="this.select();">&lt;?php
+					// WordPress Orbisius_CyberStore
+					if (empty($_REQUEST['r'])) {
+						die('It Works!');
+					}
+
+					$loc = empty($_REQUEST['r']) ? '/' : $_REQUEST['r'];
+					header('Location: ' . $loc);
+					die;
+					?&gt;</textarea>
+
+											</td>
+										</tr>
+										<tr valign="top">
+											<th scope="row">Post Transaction Callback URL</th>
+											<td><input type="text" name="<?php echo $settings_key; ?>[callback_url]" value="<?php echo $opts['callback_url']; ?>" class="widefat" />
+												<br/>Example: http://yourdomain.com/another_ipn.php
+												<br/>
+												This is useful if you want to do execute operations after a transaction. <br/>
+												This could be creating user accounts, calling external APIs e.g. mailchimp to subscribe the person to a mailing list.<br/>
+												Your script will receive all the info sent from PayPal plus a variable called <strong>digishop_paypal_status</strong>
+													which can be: VERIFIED, INVALID, or NOT_AVAILABLE which will reflect the status of the transaction.
+											</td>
+										</tr>
+									</table>
+									
+									<p class="submit">
+										<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+									</p>
+								</form>
+                            </div> <!-- .inside -->
+
+                        </div> <!-- .postbox -->
+
+                        <div class="postbox">
+
+                            <h3><span>Tell Your Friends</span></h3>
+                            <div class="inside">
+                                <?php
+                                    $plugin_data = get_plugin_data($plugin_file);
+
+                                    $app_link = urlencode($plugin_data['PluginURI']);
+                                    $app_title = urlencode($plugin_data['Name']);
+                                    $app_descr = urlencode($plugin_data['Description']);
+                                ?>
+                                <p>
+                                    <!-- AddThis Button BEGIN -->
+                                    <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+                                        <a class="addthis_button_facebook" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_twitter" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_google_plusone" g:plusone:count="false" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_linkedin" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_email" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_myspace" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_google" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_digg" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_delicious" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_stumbleupon" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_tumblr" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_favorites" addthis:url="<?php echo $app_link?>" addthis:title="<?php echo $app_title?>" addthis:description="<?php echo $app_descr?>"></a>
+                                        <a class="addthis_button_compact"></a>
+                                    </div>
+                                    <!-- The JS code is in the footer -->
+
+                                    <script type="text/javascript">
+                                    var addthis_config = {"data_track_clickback":true};
+                                    var addthis_share = {
+                                      templates: { twitter: 'Check out {{title}} at {{lurl}}' }
+                                    }
+                                    </script>
+                                    <!-- AddThis Button START part2 -->
+                                    <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js"></script>
+                                    <!-- AddThis Button END part2 -->
+                                </p>
+                            </div> <!-- .inside -->
+
+                        </div> <!-- .postbox -->
+
+                    </div> <!-- .meta-box-sortables .ui-sortable -->
+
+                </div> <!-- post-body-content -->
+
+                <!-- sidebar -->
+                <div id="postbox-container-1" class="postbox-container">
+
+                    <div class="meta-box-sortables">
+                        <?php Orbisius_CyberStoreUtil::output_plugin_sidebar(); ?>
+                    </div> <!-- .meta-box-sortables -->
+
+                </div> <!-- #postbox-container-1 .postbox-container -->
+
+            </div> <!-- #post-body .metabox-holder .columns-2 -->
+
+            <br class="clear">
+        </div> <!-- #poststuff -->		
+</div> <!-- /wrap -->
